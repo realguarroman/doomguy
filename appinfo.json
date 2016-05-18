@@ -1,0 +1,73 @@
+{
+    "appKeys": {},
+    "capabilities": [
+        ""
+    ],
+    "companyName": "jfosnav@gmail.com",
+    "enableMultiJS": true,
+    "longName": "doomguy",
+    "projectType": "native",
+    "resources": {
+        "media": [
+            {
+                "file": "fonts/ARCADE.TTF",
+                "name": "FONT_ARCADE_60",
+                "targetPlatforms": null,
+                "type": "font"
+            },
+            {
+                "file": "images/guy60.png",
+                "name": "GUY60",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            },
+            {
+                "file": "images/guy50.png",
+                "name": "GUY50",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            },
+            {
+                "file": "images/guy40.png",
+                "name": "GUY40",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            },
+            {
+                "file": "images/guy30.png",
+                "name": "GUY30",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            },
+            {
+                "file": "images/guy20.png",
+                "name": "GUY20",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            },
+            {
+                "file": "images/guy10.png",
+                "name": "GUY10",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            },
+            {
+                "file": "images/guy00.png",
+                "name": "GUY00",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            }
+        ]
+    },
+    "sdkVersion": "3",
+    "shortName": "doomguy",
+    "targetPlatforms": [
+        "basalt",
+        "chalk"
+    ],
+    "uuid": "70c10384-4c38-4675-960a-c530b119ee20",
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": true
+    }
+}
