@@ -23,11 +23,12 @@
 	#define OFFSET_Y2 0
 #endif
 
+#define ANIMATION_DURATION 10000
+
 static Window *s_main_window;
 
 static GBitmap *s_bitmap = NULL;
 static BitmapLayer *s_bitmap_layer;
-//static GBitmapSequence *s_sequence = NULL;
 static TextLayer *s_time_layer;
 
 //static AppTimer *timer;
@@ -35,13 +36,26 @@ static TextLayer *s_time_layer;
 static TextLayer *s_time;
 static GFont s_time_font;
 
+static int doomguy_level = 0;
+static int doomguy_animation = 0;
+//temporizadores
+AppTimer *timer;
 
-
-const int DOOMGUY[7] = {
+const int DOOMGUYCENTER[7] = {
   RESOURCE_ID_GUY00, RESOURCE_ID_GUY10, RESOURCE_ID_GUY20,
   RESOURCE_ID_GUY30, RESOURCE_ID_GUY40, RESOURCE_ID_GUY50, RESOURCE_ID_GUY60
 };
 
+
+const int DOOMGUYRIGHT[7] = {
+  RESOURCE_ID_GUY00, RESOURCE_ID_GUY11, RESOURCE_ID_GUY21,
+  RESOURCE_ID_GUY31, RESOURCE_ID_GUY41, RESOURCE_ID_GUY51, RESOURCE_ID_GUY60
+};
+
+const int DOOMGUYLEFT[7] = {
+  RESOURCE_ID_GUY00, RESOURCE_ID_GUY12, RESOURCE_ID_GUY22,
+  RESOURCE_ID_GUY32, RESOURCE_ID_GUY42, RESOURCE_ID_GUY52, RESOURCE_ID_GUY60
+};
 
 /*
 static void timer_handler(void *context) {
@@ -97,30 +111,24 @@ static void update_time() {
 
 static void update_doom_guy() {
 	
-	static uint8_t battery_level;
-	BatteryChargeState initial = battery_state_service_peek();
-  battery_level = initial.charge_percent;	
+
 	gbitmap_destroy(s_bitmap);	
-
-	if (battery_level < 10) {
-  	s_bitmap = gbitmap_create_with_resource(RESOURCE_ID_GUY60); 
-	} else if (battery_level >= 10 && battery_level < 30) {
-   	s_bitmap = gbitmap_create_with_resource(RESOURCE_ID_GUY50); 
-	} else if (battery_level >= 30 && battery_level < 50) {
-   	s_bitmap = gbitmap_create_with_resource(RESOURCE_ID_GUY40);
-	} else if (battery_level >= 50 && battery_level < 70) {
-   	s_bitmap = gbitmap_create_with_resource(RESOURCE_ID_GUY30);
-	} else if (battery_level >= 70 && battery_level < 80) {
-   	s_bitmap = gbitmap_create_with_resource(RESOURCE_ID_GUY20);
-	} else if (battery_level >= 80 && battery_level < 90) {
-   	s_bitmap = gbitmap_create_with_resource(RESOURCE_ID_GUY10);	
-	} else {
-    s_bitmap = gbitmap_create_with_resource(RESOURCE_ID_GUY00); 
-	}
-	
-	
+	int face=rand()%3;	
+	switch(face)
+	{
+		case 0:
+			s_bitmap = gbitmap_create_with_resource(DOOMGUYLEFT[doomguy_level]); 
+		break;
+		case 1:
+			s_bitmap = gbitmap_create_with_resource(DOOMGUYCENTER[doomguy_level]); 
+		break;
+		case 2:
+			s_bitmap = gbitmap_create_with_resource(DOOMGUYRIGHT[doomguy_level]); 
+		break;
+	}		
 
 	
+//  s_bitmap = gbitmap_create_with_resource(DOOMGUYLEFT[doomguy_level]); 
 	bitmap_layer_set_bitmap(s_bitmap_layer, s_bitmap);
 	layer_mark_dirty(bitmap_layer_get_layer(s_bitmap_layer));
 	
@@ -153,12 +161,62 @@ static void load_sequence(int ani) {
 
 */
 
-static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
+static void update_battery() {  /* mejor será suscribirse a un servicio, esto se hace cada minuto y no mola */
 	
-	update_doom_guy();
-	update_time();
+	static uint8_t battery_level;
+	BatteryChargeState initial = battery_state_service_peek();
+  battery_level = initial.charge_percent;	
+	
+	if (battery_level < 10) {
+			doomguy_level=6; 
+	} else if (battery_level >= 10 && battery_level < 30) {
+   		doomguy_level=5; 
+	} else if (battery_level >= 30 && battery_level < 50) {
+   		doomguy_level=4; 
+	} else if (battery_level >= 50 && battery_level < 70) {
+   		doomguy_level=3; 
+	} else if (battery_level >= 70 && battery_level < 80) {
+   		doomguy_level=2; 
+	} else if (battery_level >= 80 && battery_level < 90) {
+   		doomguy_level=1; 
+	} else {
+   		doomguy_level=0; 
+	}
+		
+	
+	
 	
 }
+
+
+
+static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
+	update_battery();
+	update_doom_guy();
+	update_time();	
+}
+
+static void tick_seconds(struct tm *tick_time, TimeUnits units_changed) {
+	if (doomguy_animation == 1) update_doom_guy();
+}
+
+
+void timer_callback(void *data) {
+	doomguy_animation = 0;
+}
+
+static void accel_tap_handler(AccelAxisType axis, int32_t direction)
+{
+	doomguy_animation = 1;
+	timer = app_timer_register(ANIMATION_DURATION, (AppTimerCallback) timer_callback, NULL);
+}
+
+
+//static void tick_handler_seconds(struct tm *tick_time, TimeUnits units_changed) {
+
+//	update_doom_guy();
+	
+//}
 
 static void main_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
@@ -204,7 +262,7 @@ static void main_window_load(Window *window) {
 
 //	app_timer_cancel(timer);	
 //  load_sequence(ANIMATIONS[rand()%6]);
-	
+	update_battery();
 	update_doom_guy();
 	update_time();
 }
@@ -235,10 +293,10 @@ static void init() {
   });
   window_stack_push(s_main_window, true);
 	tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
-	
+	tick_timer_service_subscribe(SECOND_UNIT , tick_seconds);
 	//Subscribe to AccelerometerService
-//	accel_tap_service_subscribe(accel_tap_handler);
-	
+  accel_tap_service_subscribe(accel_tap_handler);
+
 }
 
 static void deinit() {

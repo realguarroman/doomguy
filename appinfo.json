@@ -10,6 +10,66 @@
     "resources": {
         "media": [
             {
+                "file": "images/guy52.png",
+                "name": "GUY52",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            },
+            {
+                "file": "images/guy51.png",
+                "name": "GUY51",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            },
+            {
+                "file": "images/guy42.png",
+                "name": "GUY42",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            },
+            {
+                "file": "images/guy41.png",
+                "name": "GUY41",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            },
+            {
+                "file": "images/guy32.png",
+                "name": "GUY32",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            },
+            {
+                "file": "images/guy31.png",
+                "name": "GUY31",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            },
+            {
+                "file": "images/guy22.png",
+                "name": "GUY22",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            },
+            {
+                "file": "images/guy21.png",
+                "name": "GUY21",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            },
+            {
+                "file": "images/guy12.png",
+                "name": "GUY12",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            },
+            {
+                "file": "images/guy11.png",
+                "name": "GUY11",
+                "targetPlatforms": null,
+                "type": "bitmap"
+            },
+            {
                 "file": "fonts/ARCADE.TTF",
                 "name": "FONT_ARCADE_60",
                 "targetPlatforms": null,
