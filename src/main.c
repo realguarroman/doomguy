@@ -1,15 +1,5 @@
-/*
- * main.c
- * Sets up a Window, BitmapLayer and blank GBitmap to be used as the display
- * container for the GBitmapSequence. It also counts the number of frames.
- *
- * Animation source:
- * http://bestanimations.com/Science/Physics/Physics2.html
- */
 
 #include <pebble.h>
-
-
 
 #ifdef PBL_PLATFORM_CHALK
   #define OFFSET_X 18
@@ -57,33 +47,7 @@ const int DOOMGUYLEFT[7] = {
   RESOURCE_ID_GUY32, RESOURCE_ID_GUY42, RESOURCE_ID_GUY52, RESOURCE_ID_GUY60
 };
 
-/*
-static void timer_handler(void *context) {
-  uint32_t next_delay;
 
-		// Advance to the next APNG frame
-	
-		if(gbitmap_sequence_update_bitmap_next_frame(s_sequence, s_bitmap, &next_delay)) {
-			bitmap_layer_set_bitmap(s_bitmap_layer, s_bitmap);
-			layer_mark_dirty(bitmap_layer_get_layer(s_bitmap_layer));
-			// Timer for that delay
-			counter=counter + 1;
-			if (counter<TOTAL_ANI_FRAMES) {
-					app_timer_register(next_delay, timer_handler, NULL);
-			} else {
-					gbitmap_sequence_destroy(s_sequence);
-					s_sequence = NULL;
-				  counter=0;
-			}
-
-		} else {
-			// Start again
-	    gbitmap_sequence_restart(s_sequence);
-		}
-		
-}
-
-*/
 
 
 static void update_time() {
@@ -134,32 +98,7 @@ static void update_doom_guy() {
 	
 }
 
-/*
 
-static void load_sequence(int ani) {
-  // Free old data
-//	update_time();
-  counter=0;
-  if(s_sequence) {
-    gbitmap_sequence_destroy(s_sequence);
-    s_sequence = NULL;
-  }
-  if(s_bitmap) {
-    gbitmap_destroy(s_bitmap);
-    s_bitmap = NULL;
-  }
-
-  // Create sequence
-  s_sequence = gbitmap_sequence_create_with_resource(ani);
-
-  // Create GBitmap
-  s_bitmap = gbitmap_create_blank(gbitmap_sequence_get_bitmap_size(s_sequence), GBitmapFormat8Bit);
-
-  // Begin animation
-  timer = app_timer_register(1, timer_handler, NULL);
-}
-
-*/
 
 static void update_battery() {  /* mejor será suscribirse a un servicio, esto se hace cada minuto y no mola */
 	
@@ -183,21 +122,21 @@ static void update_battery() {  /* mejor será suscribirse a un servicio, esto s
    		doomguy_level=0; 
 	}
 		
-	
-	
-	
+
 }
 
 
 
-static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
-	update_battery();
-	update_doom_guy();
-	update_time();	
-}
 
 static void tick_seconds(struct tm *tick_time, TimeUnits units_changed) {
+	int seconds = tick_time->tm_sec;
 	if (doomguy_animation == 1) update_doom_guy();
+	if(seconds == 0) {
+		update_battery();
+		update_doom_guy();
+		update_time();	
+		//APP_LOG(APP_LOG_LEVEL_INFO, "Minuto"); 	
+	} 
 }
 
 
@@ -212,11 +151,6 @@ static void accel_tap_handler(AccelAxisType axis, int32_t direction)
 }
 
 
-//static void tick_handler_seconds(struct tm *tick_time, TimeUnits units_changed) {
-
-//	update_doom_guy();
-	
-//}
 
 static void main_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
@@ -225,7 +159,6 @@ static void main_window_load(Window *window) {
 	
 	
 	//background
-  //s_bitmap_layer = bitmap_layer_create(GRect(BACKGROUND_X,BACKGROUND_Y,180,180));
 	s_bitmap_layer = bitmap_layer_create(GRect(0 + OFFSET_X, 20 + OFFSET_Y, 144, 168));
 	layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(s_bitmap_layer));	
   s_bitmap = gbitmap_create_with_resource(RESOURCE_ID_GUY00);
@@ -236,8 +169,6 @@ static void main_window_load(Window *window) {
 	text_layer_set_background_color(s_time_layer, GColorBlack);
   text_layer_set_text_color(s_time_layer, GColorOrange);
   text_layer_set_text(s_time_layer, "00:00");
-
-
 	
 	 //Create GFont
   s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ARCADE_60));
@@ -246,34 +177,15 @@ static void main_window_load(Window *window) {
   text_layer_set_text_alignment(s_time_layer, GTextAlignmentCenter);
 	layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_time_layer));
 	
-	
-	
-	
-	
- // GRect bounds = layer_get_bounds(window_layer);
+
 
 	window_set_background_color (window, GColorBlack);
-	
-//	hour_layer_dec = bitmap_layer_create(GRect(0, -84, 72, 84));
-	
-	
- 
- // layer_add_child(window_layer, bitmap_layer_get_layer(s_bitmap_layer));
-
-//	app_timer_cancel(timer);	
-//  load_sequence(ANIMATIONS[rand()%6]);
 	update_battery();
 	update_doom_guy();
 	update_time();
 }
 
-/*
-static void accel_tap_handler(AccelAxisType axis, int32_t direction)
-{
-	load_sequence(ANIMATIONS[rand()%6]);
-}
 
-*/
 
 static void main_window_unload(Window *window) {
 	fonts_unload_custom_font(s_time_font);
@@ -292,7 +204,6 @@ static void init() {
     .unload = main_window_unload,
   });
   window_stack_push(s_main_window, true);
-	tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
 	tick_timer_service_subscribe(SECOND_UNIT , tick_seconds);
 	//Subscribe to AccelerometerService
   accel_tap_service_subscribe(accel_tap_handler);
