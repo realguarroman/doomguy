@@ -13,6 +13,12 @@
 	#define OFFSET_Y2 0
 #endif
 
+#ifdef PBL_PLATFORM_APLITE
+  #define OFFSET_X 0
+  #define OFFSET_Y 0
+	#define OFFSET_Y2 0
+#endif
+
 #define ANIMATION_DURATION 10000
 
 static Window *s_main_window;
@@ -106,20 +112,20 @@ static void update_battery() {  /* mejor será suscribirse a un servicio, esto s
 	BatteryChargeState initial = battery_state_service_peek();
   battery_level = initial.charge_percent;	
 	
-	if (battery_level < 10) {
+	if (battery_level == 0)  {
 			doomguy_level=6; 
-	} else if (battery_level >= 10 && battery_level < 30) {
+	} else if ((battery_level == 10) || (battery_level == 20)) {
    		doomguy_level=5; 
-	} else if (battery_level >= 30 && battery_level < 50) {
+	} else if ((battery_level == 30) || (battery_level == 40)) {
    		doomguy_level=4; 
-	} else if (battery_level >= 50 && battery_level < 70) {
+	} else if ((battery_level == 50) || (battery_level == 60)) {
    		doomguy_level=3; 
-	} else if (battery_level >= 70 && battery_level < 80) {
+	} else if ((battery_level == 70) || (battery_level == 80)) {
    		doomguy_level=2; 
-	} else if (battery_level >= 80 && battery_level < 90) {
+	} else if (battery_level == 90) {
    		doomguy_level=1; 
 	} else {
-   		doomguy_level=0; 
+   		doomguy_level=0;  //GOD
 	}
 		
 
@@ -167,7 +173,14 @@ static void main_window_load(Window *window) {
 	
 	s_time_layer= text_layer_create(GRect(0 + OFFSET_X, -15 + OFFSET_Y2, 144, 50)); // 0,0,144,84
 	text_layer_set_background_color(s_time_layer, GColorBlack);
-  text_layer_set_text_color(s_time_layer, GColorOrange);
+	
+	#ifdef PBL_PLATFORM_APLITE
+		text_layer_set_text_color(s_time_layer, GColorWhite);
+	#else
+		text_layer_set_text_color(s_time_layer, GColorOrange);
+	#endif
+	
+  
   text_layer_set_text(s_time_layer, "00:00");
 	
 	 //Create GFont

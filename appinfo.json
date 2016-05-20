@@ -12,61 +12,101 @@
             {
                 "file": "images/guy52.png",
                 "name": "GUY52",
-                "targetPlatforms": null,
+                "targetPlatforms": [
+                    "aplite",
+                    "basalt",
+                    "chalk"
+                ],
                 "type": "bitmap"
             },
             {
                 "file": "images/guy51.png",
                 "name": "GUY51",
-                "targetPlatforms": null,
+                "targetPlatforms": [
+                    "aplite",
+                    "basalt",
+                    "chalk"
+                ],
                 "type": "bitmap"
             },
             {
                 "file": "images/guy42.png",
                 "name": "GUY42",
-                "targetPlatforms": null,
+                "targetPlatforms": [
+                    "aplite",
+                    "basalt",
+                    "chalk"
+                ],
                 "type": "bitmap"
             },
             {
                 "file": "images/guy41.png",
                 "name": "GUY41",
-                "targetPlatforms": null,
+                "targetPlatforms": [
+                    "aplite",
+                    "basalt",
+                    "chalk"
+                ],
                 "type": "bitmap"
             },
             {
                 "file": "images/guy32.png",
                 "name": "GUY32",
-                "targetPlatforms": null,
+                "targetPlatforms": [
+                    "aplite",
+                    "basalt",
+                    "chalk"
+                ],
                 "type": "bitmap"
             },
             {
                 "file": "images/guy31.png",
                 "name": "GUY31",
-                "targetPlatforms": null,
+                "targetPlatforms": [
+                    "aplite",
+                    "basalt",
+                    "chalk"
+                ],
                 "type": "bitmap"
             },
             {
                 "file": "images/guy22.png",
                 "name": "GUY22",
-                "targetPlatforms": null,
+                "targetPlatforms": [
+                    "aplite",
+                    "basalt",
+                    "chalk"
+                ],
                 "type": "bitmap"
             },
             {
                 "file": "images/guy21.png",
                 "name": "GUY21",
-                "targetPlatforms": null,
+                "targetPlatforms": [
+                    "aplite",
+                    "basalt",
+                    "chalk"
+                ],
                 "type": "bitmap"
             },
             {
                 "file": "images/guy12.png",
                 "name": "GUY12",
-                "targetPlatforms": null,
+                "targetPlatforms": [
+                    "aplite",
+                    "basalt",
+                    "chalk"
+                ],
                 "type": "bitmap"
             },
             {
                 "file": "images/guy11.png",
                 "name": "GUY11",
-                "targetPlatforms": null,
+                "targetPlatforms": [
+                    "aplite",
+                    "basalt",
+                    "chalk"
+                ],
                 "type": "bitmap"
             },
             {
@@ -78,43 +118,71 @@
             {
                 "file": "images/guy60.png",
                 "name": "GUY60",
-                "targetPlatforms": null,
+                "targetPlatforms": [
+                    "aplite",
+                    "basalt",
+                    "chalk"
+                ],
                 "type": "bitmap"
             },
             {
                 "file": "images/guy50.png",
                 "name": "GUY50",
-                "targetPlatforms": null,
+                "targetPlatforms": [
+                    "aplite",
+                    "basalt",
+                    "chalk"
+                ],
                 "type": "bitmap"
             },
             {
                 "file": "images/guy40.png",
                 "name": "GUY40",
-                "targetPlatforms": null,
+                "targetPlatforms": [
+                    "aplite",
+                    "basalt",
+                    "chalk"
+                ],
                 "type": "bitmap"
             },
             {
                 "file": "images/guy30.png",
                 "name": "GUY30",
-                "targetPlatforms": null,
+                "targetPlatforms": [
+                    "aplite",
+                    "basalt",
+                    "chalk"
+                ],
                 "type": "bitmap"
             },
             {
                 "file": "images/guy20.png",
                 "name": "GUY20",
-                "targetPlatforms": null,
+                "targetPlatforms": [
+                    "aplite",
+                    "basalt",
+                    "chalk"
+                ],
                 "type": "bitmap"
             },
             {
                 "file": "images/guy10.png",
                 "name": "GUY10",
-                "targetPlatforms": null,
+                "targetPlatforms": [
+                    "aplite",
+                    "basalt",
+                    "chalk"
+                ],
                 "type": "bitmap"
             },
             {
                 "file": "images/guy00.png",
                 "name": "GUY00",
-                "targetPlatforms": null,
+                "targetPlatforms": [
+                    "aplite",
+                    "basalt",
+                    "chalk"
+                ],
                 "type": "bitmap"
             }
         ]
@@ -122,6 +190,7 @@
     "sdkVersion": "3",
     "shortName": "doomguy",
     "targetPlatforms": [
+        "aplite",
         "basalt",
         "chalk"
     ],
