@@ -1,7 +1,10 @@
 {
-    "appKeys": {},
+    "appKeys": {
+        "KEY_BEHAVIOUR": 1
+    },
     "capabilities": [
-        ""
+        "configurable",
+        "health"
     ],
     "companyName": "jfosnav@gmail.com",
     "enableMultiJS": true,
@@ -195,7 +198,7 @@
         "chalk"
     ],
     "uuid": "70c10384-4c38-4675-960a-c530b119ee20",
-    "versionLabel": "1.0",
+    "versionLabel": "1.2",
     "watchapp": {
         "watchface": true
     }

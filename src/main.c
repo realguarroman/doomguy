@@ -21,19 +21,28 @@
 
 #define ANIMATION_DURATION 10000
 
+#define KEY_BEHAVIOUR 1
+
+
+#define BEHAVIOUR_BATTERY 1
+#define BEHAVIOUR_HEALTH 2
+
 static Window *s_main_window;
 
 static GBitmap *s_bitmap = NULL;
 static BitmapLayer *s_bitmap_layer;
 static TextLayer *s_time_layer;
 
-//static AppTimer *timer;
-//static int counter;
+
 static TextLayer *s_time;
 static GFont s_time_font;
 
 static int doomguy_level = 0;
 static int doomguy_animation = 0;
+
+static int doomguy_behaviour = BEHAVIOUR_BATTERY;
+
+
 //temporizadores
 AppTimer *timer;
 
@@ -132,16 +141,80 @@ static void update_battery() {  /* mejor será suscribirse a un servicio, esto s
 }
 
 
+static void update_health() {
+
+		HealthValue steps_today = health_service_sum_today(HealthMetricStepCount);
+  //  APP_LOG(APP_LOG_LEVEL_INFO, "Average step count: %d steps", (int)steps_today);
+		
+	
+		
+		
+		// Define query parameters
+		const HealthMetric metric = HealthMetricStepCount;
+		const HealthServiceTimeScope scope = HealthServiceTimeScopeDaily;
+
+		// Use the average daily value from midnight to the current time
+		const time_t start = time_start_of_today();
+		const time_t end = time(NULL);
+		
+		// Check that an averaged value is accessible
+		HealthServiceAccessibilityMask mask = health_service_metric_averaged_accessible(metric, start, end, scope);
+		if(mask & HealthServiceAccessibilityMaskAvailable) {
+		// Average is available, read it
+			HealthValue average = health_service_sum_averaged(metric, start, end, scope);
+
+		//	APP_LOG(APP_LOG_LEVEL_INFO, "Average step count: %d steps", (int)average);
+			
+			
+			int diferencia;
+			diferencia = (average - steps_today);
+	
+		
+			if (diferencia < -1000)  {
+					doomguy_level=0; //GOD
+			} else if ((diferencia >= -1000) && (diferencia < 0)) {
+					doomguy_level=1; 
+			} else if ((diferencia >= 0) && (diferencia < 500)) {
+					doomguy_level=2; 
+			} else if ((diferencia >= 500) && (diferencia < 1000)) {
+					doomguy_level=3; 
+			} else if ((diferencia >= 1000) && (diferencia < 1500)) {
+					doomguy_level=4; 
+			} else if ((diferencia >= 1500) && (diferencia < 2000)) {
+					doomguy_level=5; 
+			} else if (diferencia >= 2000) {
+					doomguy_level=6;  
+			}
+			
+			
+		//	APP_LOG(APP_LOG_LEVEL_INFO, "Diferencia: %d", diferencia);
+		//	APP_LOG(APP_LOG_LEVEL_INFO, "Level: %d", doomguy_level);
+				
+		}
+	
+	
+}
+
 
 
 static void tick_seconds(struct tm *tick_time, TimeUnits units_changed) {
 	int seconds = tick_time->tm_sec;
 	if (doomguy_animation == 1) update_doom_guy();
 	if(seconds == 0) {
-		update_battery();
+		
+		switch(doomguy_behaviour) {	
+		  	
+			case BEHAVIOUR_BATTERY:
+				update_battery();
+			break;
+			case BEHAVIOUR_HEALTH:
+				update_health();
+			break;
+		}
+		
+		
 		update_doom_guy();
 		update_time();	
-		//APP_LOG(APP_LOG_LEVEL_INFO, "Minuto"); 	
 	} 
 }
 
@@ -158,8 +231,73 @@ static void accel_tap_handler(AccelAxisType axis, int32_t direction)
 
 
 
+
+void process_tuple(Tuple *t)
+{
+	
+  //Get key
+	
+
+  int key = t->key;
+	
+  //Decide what to do
+  switch(key) {	
+		  	
+			case KEY_BEHAVIOUR:
+			//It's the tempunits key
+			
+				if(strcmp(t->value->cstring, "b") == 0)
+				{
+					//Set and save
+					doomguy_behaviour = BEHAVIOUR_BATTERY;
+					persist_write_int(KEY_BEHAVIOUR, BEHAVIOUR_BATTERY);
+					update_battery();
+				}
+				else if(strcmp(t->value->cstring, "h") == 0)
+				{
+					//Set and save 
+					doomguy_behaviour = BEHAVIOUR_HEALTH;
+					persist_write_int(KEY_BEHAVIOUR, BEHAVIOUR_HEALTH);
+					update_health();
+				}
+				update_doom_guy();
+			//	APP_LOG(APP_LOG_LEVEL_INFO, " value received");
+      break;
+	}
+}
+
+
+static void in_received_handler(DictionaryIterator *iter, void *context) 
+{
+		
+    (void) context;
+    //Get data
+    Tuple *t = dict_read_first(iter);
+    while(t != NULL)
+    {		
+			process_tuple(t);      
+      //Get next
+      t = dict_read_next(iter);
+    }
+}
+
+
+
+static void inbox_dropped_callback(AppMessageResult reason, void *context) {
+  APP_LOG(APP_LOG_LEVEL_ERROR, "Message dropped!");
+}
+
+static void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResult reason, void *context) {
+  APP_LOG(APP_LOG_LEVEL_ERROR, "Outbox send failed!");
+}
+
+static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Outbox send success!");
+}
+
+
 static void main_window_load(Window *window) {
-  Layer *window_layer = window_get_root_layer(window);
+ // Layer *window_layer = window_get_root_layer(window);
 	
 	srand(time(NULL));
 	
@@ -177,7 +315,7 @@ static void main_window_load(Window *window) {
 	#ifdef PBL_PLATFORM_APLITE
 		text_layer_set_text_color(s_time_layer, GColorWhite);
 	#else
-		text_layer_set_text_color(s_time_layer, GColorOrange);
+		text_layer_set_text_color(s_time_layer, GColorYellow);
 	#endif
 	
   
@@ -193,7 +331,26 @@ static void main_window_load(Window *window) {
 
 
 	window_set_background_color (window, GColorBlack);
-	update_battery();
+	
+	
+	
+	if (persist_exists(KEY_BEHAVIOUR)) {
+		doomguy_behaviour = persist_read_int(KEY_BEHAVIOUR);		
+	} else {
+		doomguy_behaviour = BEHAVIOUR_BATTERY;
+	}
+	
+	switch(doomguy_behaviour) {	
+		  	
+			case BEHAVIOUR_BATTERY:
+				update_battery();
+			break;
+			case BEHAVIOUR_HEALTH:
+				update_health();
+			break;
+	}
+	
+	
 	update_doom_guy();
 	update_time();
 }
@@ -209,9 +366,6 @@ static void main_window_unload(Window *window) {
 static void init() {
   s_main_window = window_create();
   window_set_background_color(s_main_window, GColorBlack);
-#ifdef PBL_SDK_2
-  window_set_fullscreen(s_main_window, true);
-#endif
   window_set_window_handlers(s_main_window, (WindowHandlers) {
     .load = main_window_load,
     .unload = main_window_unload,
@@ -221,6 +375,13 @@ static void init() {
 	//Subscribe to AccelerometerService
   accel_tap_service_subscribe(accel_tap_handler);
 
+  // Register callbacks
+	app_message_register_inbox_received((AppMessageInboxReceived) in_received_handler);
+	app_message_register_inbox_dropped(inbox_dropped_callback);
+	app_message_register_outbox_failed(outbox_failed_callback);
+	app_message_register_outbox_sent(outbox_sent_callback);
+
+	app_message_open(784, 784);
 }
 
 static void deinit() {
