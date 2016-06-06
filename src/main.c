@@ -22,6 +22,7 @@
 #define ANIMATION_DURATION 10000
 
 #define KEY_BEHAVIOUR 1
+#define KEY_FONT_COLOR 2
 
 
 #define BEHAVIOUR_BATTERY 1
@@ -36,6 +37,7 @@ static TextLayer *s_time_layer;
 
 static TextLayer *s_time;
 static GFont s_time_font;
+//static GColor font_color;
 
 static int doomguy_level = 0;
 static int doomguy_animation = 0;
@@ -244,7 +246,7 @@ void process_tuple(Tuple *t)
   switch(key) {	
 		  	
 			case KEY_BEHAVIOUR:
-			//It's the tempunits key
+			
 			
 				if(strcmp(t->value->cstring, "b") == 0)
 				{
@@ -262,6 +264,19 @@ void process_tuple(Tuple *t)
 				}
 				update_doom_guy();
 			//	APP_LOG(APP_LOG_LEVEL_INFO, " value received");
+      break;
+		
+		
+			case KEY_FONT_COLOR:
+					
+					#ifdef PBL_PLATFORM_APLITE
+						text_layer_set_text_color(s_time_layer, GColorWhite);
+					#else
+						text_layer_set_text_color(s_time_layer, GColorFromHEX(t->value->int32));
+					#endif
+					persist_write_int(KEY_FONT_COLOR, t->value->int32);
+				
+			
       break;
 	}
 }
@@ -302,6 +317,28 @@ static void main_window_load(Window *window) {
 	srand(time(NULL));
 	
 	
+	
+	if (persist_exists(KEY_BEHAVIOUR)) {
+		doomguy_behaviour = persist_read_int(KEY_BEHAVIOUR);		
+	} else {
+		doomguy_behaviour = BEHAVIOUR_BATTERY;
+	}
+	
+	
+	#ifdef PBL_PLATFORM_APLITE
+		
+	#else
+		GColor font_color;
+		if (persist_exists(KEY_FONT_COLOR)) {
+			//int fontcolor_ = persist_read_int(KEY_FONT_COLOR);
+			font_color = GColorFromHEX(persist_read_int(KEY_FONT_COLOR));		
+		} else {
+			font_color = GColorOrange;			
+		}
+	#endif
+	
+	
+	
 	//background
 	s_bitmap_layer = bitmap_layer_create(GRect(0 + OFFSET_X, 20 + OFFSET_Y, 144, 168));
 	layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(s_bitmap_layer));	
@@ -315,7 +352,7 @@ static void main_window_load(Window *window) {
 	#ifdef PBL_PLATFORM_APLITE
 		text_layer_set_text_color(s_time_layer, GColorWhite);
 	#else
-		text_layer_set_text_color(s_time_layer, GColorYellow);
+		text_layer_set_text_color(s_time_layer, font_color);
 	#endif
 	
   
@@ -334,11 +371,7 @@ static void main_window_load(Window *window) {
 	
 	
 	
-	if (persist_exists(KEY_BEHAVIOUR)) {
-		doomguy_behaviour = persist_read_int(KEY_BEHAVIOUR);		
-	} else {
-		doomguy_behaviour = BEHAVIOUR_BATTERY;
-	}
+
 	
 	switch(doomguy_behaviour) {	
 		  	

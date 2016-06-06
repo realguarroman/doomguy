@@ -1,6 +1,7 @@
 {
     "appKeys": {
-        "KEY_BEHAVIOUR": 1
+        "KEY_BEHAVIOUR": 1,
+        "KEY_FONT_COLOR": 2
     },
     "capabilities": [
         "configurable",
@@ -12,6 +13,13 @@
     "projectType": "native",
     "resources": {
         "media": [
+            {
+                "characterRegex": "[0-9:.]",
+                "file": "fonts/DooM.ttf",
+                "name": "FONT_DOOM_35",
+                "targetPlatforms": null,
+                "type": "font"
+            },
             {
                 "file": "images/guy52.png",
                 "name": "GUY52",
@@ -113,6 +121,7 @@
                 "type": "bitmap"
             },
             {
+                "characterRegex": "[0-9:.]",
                 "file": "fonts/ARCADE.TTF",
                 "name": "FONT_ARCADE_60",
                 "targetPlatforms": null,
@@ -198,7 +207,7 @@
         "chalk"
     ],
     "uuid": "70c10384-4c38-4675-960a-c530b119ee20",
-    "versionLabel": "1.2",
+    "versionLabel": "1.3",
     "watchapp": {
         "watchface": true
     }
