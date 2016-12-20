@@ -28,6 +28,10 @@
 #define BEHAVIOUR_BATTERY 1
 #define BEHAVIOUR_HEALTH 2
 
+
+#define GUY_RANDOM 1
+#define GUY_CENTERED 2
+
 static Window *s_main_window;
 
 static GBitmap *s_bitmap = NULL;
@@ -48,24 +52,36 @@ static int doomguy_behaviour = BEHAVIOUR_BATTERY;
 //temporizadores
 AppTimer *timer;
 
-const int DOOMGUYCENTER[7] = {
+const int DOOMGUY_CENTER[7] = {
   RESOURCE_ID_GUY00, RESOURCE_ID_GUY10, RESOURCE_ID_GUY20,
   RESOURCE_ID_GUY30, RESOURCE_ID_GUY40, RESOURCE_ID_GUY50, RESOURCE_ID_GUY60
 };
 
 
-const int DOOMGUYRIGHT[7] = {
+const int DOOMGUY_RIGHT[7] = {
   RESOURCE_ID_GUY00, RESOURCE_ID_GUY11, RESOURCE_ID_GUY21,
   RESOURCE_ID_GUY31, RESOURCE_ID_GUY41, RESOURCE_ID_GUY51, RESOURCE_ID_GUY60
 };
 
-const int DOOMGUYLEFT[7] = {
+const int DOOMGUY_LEFT[7] = {
   RESOURCE_ID_GUY00, RESOURCE_ID_GUY12, RESOURCE_ID_GUY22,
   RESOURCE_ID_GUY32, RESOURCE_ID_GUY42, RESOURCE_ID_GUY52, RESOURCE_ID_GUY60
 };
 
+const int DOOMGUY_EVIL_SMILE[7] = {
+  RESOURCE_ID_GUY00, RESOURCE_ID_GUY13, RESOURCE_ID_GUY23,
+  RESOURCE_ID_GUY33, RESOURCE_ID_GUY43, RESOURCE_ID_GUY53, RESOURCE_ID_GUY60
+};
 
+const int DOOMGUY_ANGRY[7] = {
+  RESOURCE_ID_GUY00, RESOURCE_ID_GUY14, RESOURCE_ID_GUY24,
+  RESOURCE_ID_GUY34, RESOURCE_ID_GUY44, RESOURCE_ID_GUY54, RESOURCE_ID_GUY60
+};
 
+const int DOOMGUY_SURPRISED[7] = {
+  RESOURCE_ID_GUY00, RESOURCE_ID_GUY15, RESOURCE_ID_GUY25,
+  RESOURCE_ID_GUY35, RESOURCE_ID_GUY45, RESOURCE_ID_GUY55, RESOURCE_ID_GUY60
+};
 
 static void update_time() {
   // Get a tm structure
@@ -90,24 +106,49 @@ static void update_time() {
 }
 
 
-static void update_doom_guy() {
+static void update_doom_guy(int mode) {
 	
 
 	gbitmap_destroy(s_bitmap);	
-	int face=rand()%3;	
-	switch(face)
-	{
-		case 0:
-			s_bitmap = gbitmap_create_with_resource(DOOMGUYLEFT[doomguy_level]); 
-		break;
-		case 1:
-			s_bitmap = gbitmap_create_with_resource(DOOMGUYCENTER[doomguy_level]); 
-		break;
-		case 2:
-			s_bitmap = gbitmap_create_with_resource(DOOMGUYRIGHT[doomguy_level]); 
-		break;
-	}		
+	
+	
+	switch(mode) {	
+		  	
+			case GUY_RANDOM:
+				{
+					int face=rand()%6;	
+					switch(face)
+					{
+						case 0:
+						s_bitmap = gbitmap_create_with_resource(DOOMGUY_LEFT[doomguy_level]); 
+						break;
+						case 1:
+						s_bitmap = gbitmap_create_with_resource(DOOMGUY_CENTER[doomguy_level]); 
+						break;
+						case 2:
+						s_bitmap = gbitmap_create_with_resource(DOOMGUY_RIGHT[doomguy_level]); 
+						break;
+						case 3:
+						s_bitmap = gbitmap_create_with_resource(DOOMGUY_ANGRY[doomguy_level]); 
+						break;
+						case 4:
+						s_bitmap = gbitmap_create_with_resource(DOOMGUY_EVIL_SMILE[doomguy_level]); 
+						break;
+						case 5:
+						s_bitmap = gbitmap_create_with_resource(DOOMGUY_SURPRISED[doomguy_level]); 
+						break;
+					}		
+				}
 
+			break;
+		
+			case GUY_CENTERED:
+				{
+					s_bitmap = gbitmap_create_with_resource(DOOMGUY_CENTER[doomguy_level]); 	
+				}
+			break;
+	
+	}
 	
 //  s_bitmap = gbitmap_create_with_resource(DOOMGUYLEFT[doomguy_level]); 
 	bitmap_layer_set_bitmap(s_bitmap_layer, s_bitmap);
@@ -187,7 +228,7 @@ static void update_health() {
 			} else if (diferencia >= 2000) {
 					doomguy_level=6;  
 			}
-			
+		
 			
 		//	APP_LOG(APP_LOG_LEVEL_INFO, "Diferencia: %d", diferencia);
 		//	APP_LOG(APP_LOG_LEVEL_INFO, "Level: %d", doomguy_level);
@@ -201,7 +242,7 @@ static void update_health() {
 
 static void tick_seconds(struct tm *tick_time, TimeUnits units_changed) {
 	int seconds = tick_time->tm_sec;
-	if (doomguy_animation == 1) update_doom_guy();
+	if (doomguy_animation == 1) update_doom_guy(GUY_RANDOM);
 	if(seconds == 0) {
 		
 		switch(doomguy_behaviour) {	
@@ -215,7 +256,7 @@ static void tick_seconds(struct tm *tick_time, TimeUnits units_changed) {
 		}
 		
 		
-		update_doom_guy();
+		update_doom_guy(GUY_CENTERED);
 		update_time();	
 	} 
 }
@@ -262,7 +303,7 @@ void process_tuple(Tuple *t)
 					persist_write_int(KEY_BEHAVIOUR, BEHAVIOUR_HEALTH);
 					update_health();
 				}
-				update_doom_guy();
+				update_doom_guy(GUY_CENTERED);
 			//	APP_LOG(APP_LOG_LEVEL_INFO, " value received");
       break;
 		
@@ -384,7 +425,7 @@ static void main_window_load(Window *window) {
 	}
 	
 	
-	update_doom_guy();
+	update_doom_guy(GUY_CENTERED);
 	update_time();
 }
 
